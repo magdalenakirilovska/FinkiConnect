@@ -1,0 +1,48 @@
+package com.magdalenakirilovska.finkiconnect.controller;
+
+import com.magdalenakirilovska.finkiconnect.exceptions.InvalidArgumentsException;
+import com.magdalenakirilovska.finkiconnect.exceptions.PasswordsDoNotMatchException;
+import com.magdalenakirilovska.finkiconnect.model.Role;
+import com.magdalenakirilovska.finkiconnect.service.AuthService;
+import com.magdalenakirilovska.finkiconnect.service.UserService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+@RequestMapping("/register")
+public class RegisterController {
+
+    private final UserService userService;
+
+    public RegisterController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
+    public String getRegisterPage(@RequestParam(required = false) String error, Model model){
+        if(error!=null && !error.isEmpty()){
+            model.addAttribute("hasError", true);
+            model.addAttribute("error", error);
+        }
+        model.addAttribute("bodyContent", "register");
+        return "master-template";
+    }
+
+    @PostMapping
+    public String register(@RequestParam String username,
+                           @RequestParam String password,
+                           @RequestParam String repeatedPassword,
+                           @RequestParam Role role){
+        try{
+            userService.register(username, password, repeatedPassword, role);
+            return "redirect:/login";
+        } catch (PasswordsDoNotMatchException | InvalidArgumentsException exception){
+            return "redirect:/register?error=" + exception.getMessage();
+        }
+
+    }
+}

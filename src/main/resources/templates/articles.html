@@ -1,0 +1,46 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+
+    <div class="container">
+        <div class="row" style="margin-top: 50px">
+            <div class="col-md-12">
+                <div class="col mb-12">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <a href="/articles/add-article" class="btn btn-block btn-dark">Write an article</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${articles.size() > 0}" style="margin-top: 50px">
+                    <div th:each="article : ${articles}">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="card-title" th:text="${article.getTitle()}"></h2>
+                                <p th:utext="${article.getContent()}"></p>
+                                <a th:if="${article.getArticleFile() != null}" th:href="@{'/articles/download/{id}' (id=${article.getId()})}">Download</a>
+                            </div>
+                            <div class="card-footer text-muted">
+                                Posted on <b th:text="${article.getDateCreatedOn()}"></b> by
+                                <a th:href="@{'/articles/{username}' (username=${article.getUsername()})}"><b
+                                        th:text="${article.getUsername()}"></b></a>
+                                <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                                    <form th:method="DELETE"
+                                          th:action="@{'/articles/delete/{id}' (id=${article.getId()})}">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fa fa-trash">Delete</i>
+                                        </button>
+                                    </form>
+                                </th:block>
+                                <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                                    <a th:href="@{'/articles/edit-form/{id}' (id=${article.getId()})}"
+                                       class="btn btn-sm btn-info">
+                                        <i class="fa fa-trash">Edit</i></a>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
